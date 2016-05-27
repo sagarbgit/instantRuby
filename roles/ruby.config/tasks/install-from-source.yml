@@ -1,0 +1,71 @@
+---
+- name: Update apt cache (Ubuntu).
+  apt: update_cache=yes cache_valid_time=86400
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Install packages required to build ruby (Ubuntu).
+  apt: "name={{ item }} state=present"
+  with_items:
+    - zlib1g-dev
+    - libssl-dev
+    - libyaml-dev
+    - libreadline6-dev
+    - zlib1g-dev
+    - libncurses5-dev
+    - libffi-dev
+    - libgdbm3
+    - libgdbm-dev
+    - build-essential
+    - openssl 
+    - libreadline6
+    - curl
+    - git-core 
+    - zlib1g 
+    - libsqlite3-dev 
+    - sqlite3 
+    - libxml2-dev 
+    - libxslt-dev 
+    - autoconf 
+    - libc6-dev 
+    - ncurses-dev 
+    - automake
+    - libtool 
+    - bison 
+    - nodejs 
+    - subversion
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Download ruby.
+  get_url:
+    url: "{{ ruby_download_url }}"
+    dest: "{{ workspace }}/ruby-{{ ruby_version }}.tar.gz"
+
+- name: Extract ruby.
+  unarchive:
+    src: "{{ workspace }}/ruby-{{ ruby_version }}.tar.gz"
+    dest: "{{ workspace }}/"
+    copy: no
+
+- name: Build ruby.
+  command:
+    chdir={{ workspace }}/ruby-{{ ruby_version }}
+    creates=/usr/local/bin/ruby
+    {{ item }}
+  with_items:
+    - ./configure --enable-shared
+    - make
+    - sudo make install
+
+- name: Add ruby symlinks.
+  file:
+    src: "/usr/local/bin/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    state: link
+    force: yes
+  with_items:
+    - erb
+    - gem
+    - irb
+    - rake
+    - rdoc
+    - ruby

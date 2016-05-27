@@ -1,0 +1,11 @@
+---
+# tasks file for nginx.config
+    - name: Installs nginx web server
+      apt: pkg=nginx state=installed update_cache=true
+      notify:
+        - stop nginx
+
+    - name: Uninstall apache2 web server
+      apt: pkg=apache2 state=removed purge=yes
+      notify:
+        - start nginx

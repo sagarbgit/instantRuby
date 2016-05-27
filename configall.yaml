@@ -1,0 +1,5 @@
+---
+  - hosts: devservers
+    roles: 
+      - { role: ruby.config }
+      - { role: nginx.config } 
